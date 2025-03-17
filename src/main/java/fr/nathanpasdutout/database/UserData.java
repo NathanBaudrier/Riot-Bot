@@ -31,7 +31,7 @@ public class UserData {
     }
 
     public void createData(String PUUID) {
-        this.database.sendQuery("INSERT INTO user VALUES (" + this.user.getId() + "," + PUUID + ");");
+        this.database.sendQuery("INSERT INTO user VALUES (\"" + this.user.getId() + "\", \"" + PUUID + "\");");
     }
 
     public String getPUUID() {
