@@ -21,7 +21,7 @@ public class Database {
                 this.init();
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error while opening the database file: " + e.getMessage());
         }
     }
 
@@ -59,29 +59,27 @@ public class Database {
         }
     }
 
-    public ResultSet sendQuery(String query) {
+    public ResultSet sendResultQuery(String query) {
         try {
-            Statement state = this.conn.createStatement();
-            ResultSet result = null;
+            PreparedStatement statement = this.conn.prepareStatement(query);
 
-            if(query.split(" ")[0].equalsIgnoreCase("SELECT")) {
-                 result = state.executeQuery(query);
-            } else {
-                state.execute(query);
-            }
-
-            try {
-                state.close();
-            } catch(SQLException e) {
-                System.err.println("Error while closing statement: " + e.getMessage());
-            }
-
-            return result;
+            return statement.executeQuery();
         } catch(SQLException e) {
-            System.err.println("SQL Request as failed: " + e.getMessage());
+            System.err.println("SQL result query as failed: " + e.getMessage());
         }
 
         return null;
+    }
+
+    public void sendQuery(String query) {
+        try {
+            PreparedStatement statement =  this.conn.prepareStatement(query);
+
+            statement.executeUpdate();
+
+        } catch(SQLException e) {
+            System.err.println("SQL query as failed: " + e.getMessage());
+        }
     }
 
     public void close() {

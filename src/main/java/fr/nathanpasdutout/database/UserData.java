@@ -17,7 +17,7 @@ public class UserData {
     }
 
     public boolean hasData() {
-        ResultSet result = this.database.sendQuery("SELECT * FROM user WHERE discord_id = " + user.getId());
+        ResultSet result = this.database.sendResultQuery("SELECT * FROM user WHERE discord_id = " + user.getId());
 
         try {
             return result.next();
@@ -25,11 +25,7 @@ public class UserData {
             System.err.println("Error while trying to get data: " + e.getMessage());
         }
 
-        try {
-            result.close();
-        } catch(SQLException e) {
-            System.err.println("Error while closing the SQL result: " + e.getMessage());
-        }
+        this.closeResult(result);
 
         return false;
     }
@@ -39,7 +35,7 @@ public class UserData {
     }
 
     public String getPUUID() {
-        ResultSet result = this.database.sendQuery("SELECT puuid FROM user WHERE discord_id = " + this.user.getId());
+        ResultSet result = this.database.sendResultQuery("SELECT puuid FROM user WHERE discord_id = " + this.user.getId());
 
         try {
             if(result.next()) {
@@ -49,12 +45,16 @@ public class UserData {
             System.err.println("Error while trying to get PUUID: " + e.getMessage());
         }
 
+        this.closeResult(result);
+
+        return null;
+    }
+
+    private void closeResult(ResultSet result) {
         try {
             result.close();
         } catch(SQLException e) {
             System.err.println("Error while closing the SQL result: " + e.getMessage());
         }
-
-        return null;
     }
 }
