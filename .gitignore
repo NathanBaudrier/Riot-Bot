@@ -23,5 +23,8 @@
 hs_err_pid*
 replay_pid*
 
+# DB files
+.db
+
 # Private files #
 .env
