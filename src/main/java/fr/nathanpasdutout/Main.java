@@ -1,5 +1,6 @@
 package fr.nathanpasdutout;
 
+import fr.nathanpasdutout.commands.account.Register;
 import fr.nathanpasdutout.database.Database;
 import fr.nathanpasdutout.events.Events;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -8,7 +9,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import fr.nathanpasdutout.commands.BaseCommand;
-import fr.nathanpasdutout.commands.Ping;
+import fr.nathanpasdutout.commands.user.Ping;
 
 public class Main {
 
@@ -17,7 +18,8 @@ public class Main {
     private static Dotenv env;
 
     private static final BaseCommand[] commands = {
-            new Ping()
+            new Ping(),
+            new Register()
     };
 
     public static void main(String[] args) {
@@ -30,7 +32,7 @@ public class Main {
                 .addEventListeners(getCommands())
                 .build();
 
-        database = new Database("src/main/java/org/example/database/database.db");
+        database = new Database("src/main/java/fr/nathanpasdutout/database.db");
         database.connection();
     }
 
