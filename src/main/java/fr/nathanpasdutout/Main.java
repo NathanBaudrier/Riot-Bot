@@ -1,8 +1,8 @@
 package fr.nathanpasdutout;
 
-import fr.nathanpasdutout.commands.Register;
 import fr.nathanpasdutout.database.Database;
 import fr.nathanpasdutout.events.Events;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -14,15 +14,16 @@ public class Main {
 
     private static JDA bot;
     private static Database database;
+    private static Dotenv env;
 
     private static final BaseCommand[] commands = {
-            new Ping(),
-            new Register()
+            new Ping()
     };
 
     public static void main(String[] args) {
+        env = Dotenv.load();
 
-        bot = JDABuilder.createDefault(TempClass.TOKEN)
+        bot = JDABuilder.createDefault(env.get("DISCORD_TOKEN"))
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("Riot"))
                 .addEventListeners(new Events())
@@ -39,6 +40,10 @@ public class Main {
 
     public static Database getDatabase() {
         return database;
+    }
+
+    public static Dotenv getEnv() {
+        return env;
     }
 
     public static BaseCommand[] getCommands() {
