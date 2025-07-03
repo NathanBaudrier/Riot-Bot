@@ -1,5 +1,6 @@
 package fr.nathanpasdutout;
 
+import fr.nathanpasdutout.commands.account.Rank;
 import fr.nathanpasdutout.commands.account.Register;
 import fr.nathanpasdutout.database.Database;
 import fr.nathanpasdutout.events.Events;
@@ -12,14 +13,14 @@ import fr.nathanpasdutout.commands.BaseCommand;
 import fr.nathanpasdutout.commands.user.Ping;
 
 public class Main {
-
     private static JDA bot;
     private static Database database;
     private static Dotenv env;
 
     private static final BaseCommand[] commands = {
             new Ping(),
-            new Register()
+            new Register(),
+            new Rank()
     };
 
     public static void main(String[] args) {
