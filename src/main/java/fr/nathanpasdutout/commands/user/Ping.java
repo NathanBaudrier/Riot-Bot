@@ -1,6 +1,7 @@
-package fr.nathanpasdutout.commands;
+package fr.nathanpasdutout.commands.user;
 
 import fr.nathanpasdutout.Main;
+import fr.nathanpasdutout.commands.BaseCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class Ping extends BaseCommand {
