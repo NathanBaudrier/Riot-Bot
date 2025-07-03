@@ -40,15 +40,4 @@ public class Events extends ListenerAdapter {
             });
         });
     }
-
-    @Override
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        User user = event.getUser();
-        Channel channel =  event.getGuild().getGuildChannelById("1336325415148720141");
-    }
-
-    @Override
-    public void onSessionDisconnect(SessionDisconnectEvent event) {
-        System.out.println("Bot OFF.");
-    }
 }
