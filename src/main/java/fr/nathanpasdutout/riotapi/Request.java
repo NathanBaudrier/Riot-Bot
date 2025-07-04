@@ -43,21 +43,4 @@ public class Request {
 
         return null;
     }
-
-    public HttpResponse<String> sendSimpleRequest() {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder(URI.create(this.url))
-                .GET()
-                .build();
-
-        try {
-            return client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch(IOException e) {
-            System.err.println("Connection as failed: " + e.getMessage());
-        } catch(InterruptedException e) {
-            System.err.println("Connection was interrupted: " + e.getMessage());
-        }
-
-        return null;
-    }
 }

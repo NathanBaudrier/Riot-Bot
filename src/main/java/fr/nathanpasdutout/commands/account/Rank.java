@@ -1,42 +1,100 @@
 package fr.nathanpasdutout.commands.account;
 
-import fr.nathanpasdutout.Main;
 import fr.nathanpasdutout.commands.BaseCommand;
+import fr.nathanpasdutout.exceptions.AccountNotFoundException;
 import fr.nathanpasdutout.riotapi.LolData;
+import fr.nathanpasdutout.utils.MyImage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.net.URL;
 
 public class Rank extends BaseCommand {
 
     public Rank() {
-        super("rank", "Show your ranked information.");
+        super("rank", "Show your ranked information.",
+                new OptionData(OptionType.STRING, "type", "Choose Solo-q of Flex section.")
+                        .addChoice("Solo-q", LolData.SOLO)
+                        .addChoice("Flex", LolData.FLEX),
+                new OptionData(OptionType.USER, "user", "Get rank's data from a user.")
+        );
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        JSONArray array = LolData.getLeagueData(event.getUser());
+        User user = event.getOption("user") == null ? event.getUser() : event.getOption("user").getAsUser();
 
-        if(array == null) {
-            event.reply("You are not registered or the request as failed.").setEphemeral(true).queue();
-            return;
+        try {
+            JSONArray data =  LolData.getLeagueData(user);
+
+            if(data == null) {
+                event.reply("❌ The request as failed.")
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+
+            if(event.getOption("type") == null) {
+                //TODO
+                return;
+            }
+
+            String rankType = event.getOption("type").getAsString();
+            JSONObject rankData = null;
+
+            for(int i = 0; i < data.length(); i++) {
+                 if(data.getJSONObject(i).getString("queueType").equals(rankType)) {
+                     rankData = data.getJSONObject(i);
+                     break;
+                 }
+            }
+
+            if(rankData == null) {
+                event.reply("No data found for this entry.")
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+
+            System.out.println("ranked-icons/Rank=" +
+                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
+                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
+
+            MyImage image = new MyImage("ranked-icons/Rank=" +
+                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
+                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
+
+            InputStream is = image.getImageAsInputStream();
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("Ranked Information");
+            embed.setDescription(user.getName() + " | " + (rankType.equals(LolData.SOLO) ? "Solo-Q" : "Flex"));
+            embed.addField("LP", String.valueOf(rankData.getInt(LolData.LEAGUE_POINTS)), true);
+            embed.addField("Rank", rankData.getString(LolData.TIER) + " " + rankData.getString(LolData.RANK), true);
+            embed.addField("Wins", String.valueOf(rankData.getInt(LolData.WINS)), false);
+            embed.addField("Losses", String.valueOf(rankData.getInt(LolData.LOSSES)), true);
+
+            if (is != null) {
+                embed.setThumbnail("attachment://rank.png");
+
+                event.replyEmbeds(embed.build())
+                        .addFiles(FileUpload.fromData(is, "rank.png"))
+                        .queue();
+            } else {
+                event.replyEmbeds(embed.build()).queue();
+            }
+
+        } catch (AccountNotFoundException e) {
+            event.reply("❌ No account was found.")
+                    .setEphemeral(true)
+                    .queue();
         }
-
-        JSONObject json = array.getJSONObject(0);
-
-        System.out.println("ranked-emblems/Rank=" + json.getString(LolData.TIER).substring(0, 1).toUpperCase() + json.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
-
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle("Ranked Information");
-        embed.setDescription("You can show " + event.getUser().getName() + "'s ranked information.");
-        embed.addField("LP", String.valueOf(json.getInt(LolData.LEAGUE_POINTS)), true);
-        embed.addField("Rank", json.getString(LolData.TIER) + " " + json.getString(LolData.RANK), true);
-        embed.addField("Wins", String.valueOf(json.getInt(LolData.WINS)), false);
-        embed.addField("Losses", String.valueOf(json.getInt(LolData.LOSSES)), true);
-
-        event.replyEmbeds(embed.build()).queue();
     }
 }
