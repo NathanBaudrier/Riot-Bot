@@ -2,6 +2,7 @@ package fr.nathanpasdutout;
 
 import fr.nathanpasdutout.commands.account.Rank;
 import fr.nathanpasdutout.commands.account.Register;
+import fr.nathanpasdutout.commands.lol.Status;
 import fr.nathanpasdutout.database.Database;
 import fr.nathanpasdutout.events.Events;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -20,7 +21,8 @@ public class Main {
     private static final BaseCommand[] commands = {
             new Ping(),
             new Register(),
-            new Rank()
+            new Rank(),
+            new Status()
     };
 
     public static void main(String[] args) {

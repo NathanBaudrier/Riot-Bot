@@ -2,6 +2,7 @@ package fr.nathanpasdutout.commands.account;
 
 import fr.nathanpasdutout.commands.BaseCommand;
 import fr.nathanpasdutout.database.UserData;
+import fr.nathanpasdutout.exceptions.RequestFailedException;
 import fr.nathanpasdutout.riotapi.LolData;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,15 +26,17 @@ public class Register extends BaseCommand {
             return;
         }
 
-        JSONObject json = LolData.getAccountData(event.getOptions().get(0).getAsString(), event.getOptions().get(1).getAsString());
+        try {
+            JSONObject json = LolData.getAccountData(event.getOptions().get(0).getAsString(), event.getOptions().get(1).getAsString());
 
-        if(json == null) {
-            event.reply("Account not found.").setEphemeral(true).queue();
-            return;
+            data.createData(json.getString(LolData.PUUID));
+            event.reply("✅ Your account has been successfully created!")
+                    .setEphemeral(true)
+                    .queue();
+        } catch(RequestFailedException e) {
+            event.reply("❌ Account not found.")
+                    .setEphemeral(true)
+                    .queue();
         }
-
-        data.createData(json.getString(LolData.PUUID));
-
-        event.reply("Your account has been successfully created!").setEphemeral(true).queue();
     }
 }

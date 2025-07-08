@@ -2,6 +2,7 @@ package fr.nathanpasdutout.commands.account;
 
 import fr.nathanpasdutout.commands.BaseCommand;
 import fr.nathanpasdutout.exceptions.AccountNotFoundException;
+import fr.nathanpasdutout.exceptions.RequestFailedException;
 import fr.nathanpasdutout.riotapi.LolData;
 import fr.nathanpasdutout.utils.MyImage;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -67,19 +68,19 @@ public class Rank extends BaseCommand {
                     rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
                     rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
 
-            MyImage image = new MyImage("ranked-icons/Rank=" +
-                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
-                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
-
-            InputStream is = image.getImageAsInputStream();
-
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("Ranked Information");
             embed.setDescription(user.getName() + " | " + (rankType.equals(LolData.SOLO) ? "Solo-Q" : "Flex"));
             embed.addField("LP", String.valueOf(rankData.getInt(LolData.LEAGUE_POINTS)), true);
             embed.addField("Rank", rankData.getString(LolData.TIER) + " " + rankData.getString(LolData.RANK), true);
-            embed.addField("Wins", String.valueOf(rankData.getInt(LolData.WINS)), false);
+            embed.addBlankField(true);
+            embed.addField("Wins", String.valueOf(rankData.getInt(LolData.WINS)), true);
             embed.addField("Losses", String.valueOf(rankData.getInt(LolData.LOSSES)), true);
+
+            MyImage image = new MyImage("ranked-icons/Rank=" +
+                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
+                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
+            InputStream is = image.getImageAsInputStream();
 
             if (is != null) {
                 embed.setThumbnail("attachment://rank.png");
@@ -93,6 +94,10 @@ public class Rank extends BaseCommand {
 
         } catch (AccountNotFoundException e) {
             event.reply("❌ No account was found.")
+                    .setEphemeral(true)
+                    .queue();
+        } catch(RequestFailedException e) {
+            event.reply("❌ The request as failed (error " + e.getErrorCode() + ").")
                     .setEphemeral(true)
                     .queue();
         }
