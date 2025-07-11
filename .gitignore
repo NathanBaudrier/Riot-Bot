@@ -24,7 +24,10 @@ hs_err_pid*
 replay_pid*
 
 # DB files
-.db
+*.db
 
 # Private files #
-.env
+*.env
+
+# Mac files #
+*.DS_Store
