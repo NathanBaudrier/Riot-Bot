@@ -27,7 +27,7 @@ public class Main {
 
     public static void main(String[] args) {
         env = Dotenv.load();
-        System.out.println("test");
+        System.out.println("test.");
 
         bot = JDABuilder.createDefault(env.get("DISCORD_TOKEN"))
                 .setStatus(OnlineStatus.ONLINE)
