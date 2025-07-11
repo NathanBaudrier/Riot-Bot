@@ -27,6 +27,7 @@ replay_pid*
 *.db
 
 # Private files #
+target/*
 *.env
 
 # Mac files #
