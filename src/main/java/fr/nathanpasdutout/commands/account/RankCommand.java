@@ -15,11 +15,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.net.URL;
 
-public class Rank extends BaseCommand {
+public class RankCommand extends BaseCommand {
 
-    public Rank() {
+    public RankCommand() {
         super("rank", "Show your ranked information.",
                 new OptionData(OptionType.STRING, "type", "Choose Solo-q of Flex section.")
                         .addChoice("Solo-q", LolData.SOLO)

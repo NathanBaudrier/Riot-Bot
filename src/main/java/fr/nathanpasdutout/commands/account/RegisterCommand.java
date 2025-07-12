@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.json.JSONObject;
 
-public class Register extends BaseCommand {
+public class RegisterCommand extends BaseCommand {
 
-    public Register() {
+    public RegisterCommand() {
         super("register", "Allows to register your account in our database (DiscordID and PUUID only).",
                 new OptionData(OptionType.STRING, "game_name", "In-game pseudo", true),
                 new OptionData(OptionType.STRING, "tag_line", "Tag line of your account (ex: EUW)", true));

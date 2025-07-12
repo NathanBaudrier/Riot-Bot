@@ -11,12 +11,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class Status extends BaseCommand {
+public class StatusCommand extends BaseCommand {
 
-    public Status() {
+    public StatusCommand() {
         super("status", "Shows servers status.");
     }
 

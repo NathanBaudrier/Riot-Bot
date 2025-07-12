@@ -4,9 +4,9 @@ import fr.nathanpasdutout.Main;
 import fr.nathanpasdutout.commands.BaseCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class Ping extends BaseCommand {
+public class PingCommand extends BaseCommand {
 
-    public Ping() {
+    public PingCommand() {
         super("ping", "Renvoie la latence du bot.", null);
     }
 
