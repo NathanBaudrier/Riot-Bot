@@ -1,17 +1,21 @@
 package fr.nathanpasdutout;
 
-import fr.nathanpasdutout.commands.account.Rank;
-import fr.nathanpasdutout.commands.account.Register;
-import fr.nathanpasdutout.commands.lol.Status;
+import fr.nathanpasdutout.commands.account.RankCommand;
+import fr.nathanpasdutout.commands.account.RegisterCommand;
+import fr.nathanpasdutout.commands.lol.StatusCommand;
+import fr.nathanpasdutout.commands.user.InviteCommand;
+import fr.nathanpasdutout.commands.BaseCommand;
+import fr.nathanpasdutout.commands.user.PingCommand;
 import fr.nathanpasdutout.database.Database;
 import fr.nathanpasdutout.events.Events;
+
+import fr.nathanpasdutout.utils.Bot;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import fr.nathanpasdutout.commands.BaseCommand;
-import fr.nathanpasdutout.commands.user.Ping;
 
 public class Main {
     private static JDA bot;
@@ -19,10 +23,11 @@ public class Main {
     private static Dotenv env;
 
     private static final BaseCommand[] commands = {
-            new Ping(),
-            new Register(),
-            new Rank(),
-            new Status()
+            new PingCommand(),
+            new RegisterCommand(),
+            new RankCommand(),
+            new StatusCommand(),
+            new InviteCommand()
     };
 
     public static void main(String[] args) {
@@ -30,8 +35,8 @@ public class Main {
         System.out.println("test.");
 
         bot = JDABuilder.createDefault(env.get("DISCORD_TOKEN"))
-                .setStatus(OnlineStatus.ONLINE)
-                .setActivity(Activity.playing("Riot"))
+                .setStatus(Bot.getStatus())
+                .setActivity(Bot.getActivity())
                 .addEventListeners(new Events())
                 .addEventListeners(getCommands())
                 .build();

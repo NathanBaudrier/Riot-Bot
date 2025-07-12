@@ -1,8 +1,10 @@
 package fr.nathanpasdutout.events;
 
+import fr.nathanpasdutout.utils.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
@@ -18,26 +20,14 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildReady(GuildReadyEvent event) {
-        System.out.println("Riot Bot is now online...");
+        Bot.loadCommandsOnGuild(event.getGuild());
+    }
 
-        Guild guild = event.getGuild();
-        SlashCommandData[] commandsData = Arrays.stream(Main.getCommands()).map(BaseCommand::getCommandData).toArray(SlashCommandData[]::new);
-        if (guild.retrieveCommands().complete().isEmpty()) {
-            guild.upsertCommand(commandsData[0]).queue();
-        }
-        guild.retrieveCommands().queue(commands -> {
-            commands.forEach(command -> {
-                boolean exist = false;
-                for (SlashCommandData data : commandsData) {
-                    if (command.getName().equals(data.getName())) {
-                        exist = true;
-                        guild.upsertCommand(data).queue();
-                    } else if (commands.stream().map(Command::getName).noneMatch(name -> name.equals(data.getName()))) {
-                        guild.upsertCommand(data).queue();
-                    }
-                }
-                if (!exist) guild.deleteCommandById(command.getId()).queue();
-            });
-        });
+    @Override
+    public void onGuildJoin(GuildJoinEvent event) {
+        Bot.loadCommandsOnGuild(event.getGuild());
+
+        event.getJDA().getPresence().setStatus(Bot.getStatus());
+        event.getJDA().getPresence().setActivity(Bot.getActivity());
     }
 }
