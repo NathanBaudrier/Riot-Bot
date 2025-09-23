@@ -1,6 +1,7 @@
 package fr.nathanpasdutout.database;
 
 import fr.nathanpasdutout.Main;
+
 import net.dv8tion.jda.api.entities.User;
 
 import java.sql.ResultSet;
