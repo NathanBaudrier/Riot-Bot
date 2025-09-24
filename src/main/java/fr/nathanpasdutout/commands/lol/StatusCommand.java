@@ -112,7 +112,7 @@ public class StatusCommand extends BaseCommand {
 
             content.append("- **Created at:** ").append(Utils.getDateFormat(incident.getString("created_at"))).append("\n");
             content.append("- **Updated at:** ").append(Utils.getDateFormat(incident.getString("updated_at"))).append("\n");
-            content.append("- **Archived at:** ").append(Utils.getDateFormat(incident.getString("archived_at"))).append("\n");
+            content.append("- **Archived at:** ").append(Utils.getDateFormat(incident.getString("archive_at"))).append("\n");
             content.append("- **Active:** ").append(Utils.capitalizeFirstLetter(incident.getString("active"))).append("\n");
             content.append("- **Severity:** ").append(Utils.capitalizeFirstLetter(incident.getString("incident_severity"))).append("\n");
             content.append("- **Concerned platforms:** ").append(incident.getJSONArray("platforms").join(",").replace('"', ' ')).append("\n");
