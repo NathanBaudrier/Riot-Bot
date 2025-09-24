@@ -23,11 +23,12 @@ public class StatusCommand extends BaseCommand {
         try {
             JSONObject data = LolData.getStatusData();
 
-            JSONArray maintenances = data.getJSONArray("maintenances");
-            JSONArray incidents = data.getJSONArray("incidents");
-
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("Servers status");
+            embed.setDescription("- **Region:** " + data.getString("name") + "\n");
+
+            JSONArray maintenances = data.getJSONArray("maintenances");
+            JSONArray incidents = data.getJSONArray("incidents");
 
             if(maintenances.isEmpty() && incidents.isEmpty()) {
                 embed.setColor(Color.GREEN);
@@ -67,7 +68,6 @@ public class StatusCommand extends BaseCommand {
                 }
             }
 
-            content += "- **Region:** " + maintenance.getString("name") + "\n";
             content += "- **Status:** " + Utils.capitalizeFirstLetter(maintenance.getString("maintenance_status")) + "\n";
             content += "- **Concerned platforms:** " + maintenance.getJSONArray("platforms").join(",").replace('"', ' ') + "\n";
 
