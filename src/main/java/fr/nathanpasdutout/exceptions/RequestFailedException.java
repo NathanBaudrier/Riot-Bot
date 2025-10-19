@@ -5,7 +5,7 @@ public class RequestFailedException extends Exception {
     private final int errorCode;
 
     public RequestFailedException(int errorCode) {
-        super("The request as failed (error " + errorCode + ").");
+        super("Request has failed (error " + errorCode + ").");
 
         this.errorCode = errorCode;
     }
