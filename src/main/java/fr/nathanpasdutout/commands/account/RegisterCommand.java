@@ -1,13 +1,14 @@
 package fr.nathanpasdutout.commands.account;
 
+import fr.nathanpasdutout.Main;
 import fr.nathanpasdutout.commands.BaseCommand;
 import fr.nathanpasdutout.database.UserData;
 import fr.nathanpasdutout.exceptions.RequestFailedException;
 import fr.nathanpasdutout.riotapi.LolData;
+import fr.nathanpasdutout.riotapi.elements.account.Account;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.json.JSONObject;
 
 public class RegisterCommand extends BaseCommand {
 
@@ -22,20 +23,22 @@ public class RegisterCommand extends BaseCommand {
         UserData data = new UserData(event.getUser());
 
         if(data.hasData()) {
-            event.reply("You are already registered!").setEphemeral(true).queue();
+            event.reply("You are already registered!")
+                    .setEphemeral(true)
+                    .queue();
+
             return;
         }
 
         try {
-            JSONObject json = LolData.getAccountData(event.getOptions().get(0).getAsString(), event.getOptions().get(1).getAsString());
+            Account account = LolData.getAccountData(event.getOptions().get(0).getAsString(), event.getOptions().get(1).getAsString());
+            data.createData(account.getPUUID());
 
-            data.createData(json.getString(LolData.PUUID));
-            event.reply("✅ Your account has been successfully created!")
+            event.reply("Your account has been created!")
                     .setEphemeral(true)
                     .queue();
-        } catch(RequestFailedException e) {
-            event.reply("❌ Account not found.")
-                    .setEphemeral(true)
+        } catch(RequestFailedException exception) {
+            event.reply("Request has failed: Error " + exception.getErrorCode())
                     .queue();
         }
     }

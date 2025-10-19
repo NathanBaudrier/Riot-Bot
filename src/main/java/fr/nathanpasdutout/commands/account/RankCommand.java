@@ -4,25 +4,27 @@ import fr.nathanpasdutout.commands.BaseCommand;
 import fr.nathanpasdutout.exceptions.AccountNotFoundException;
 import fr.nathanpasdutout.exceptions.RequestFailedException;
 import fr.nathanpasdutout.riotapi.LolData;
+import fr.nathanpasdutout.riotapi.elements.league.Rank;
 import fr.nathanpasdutout.utils.MyImage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.InputStream;
+import java.util.Random;
 
 public class RankCommand extends BaseCommand {
 
     public RankCommand() {
         super("rank", "Show your ranked information.",
                 new OptionData(OptionType.STRING, "type", "Choose Solo-q of Flex section.")
-                        .addChoice("Solo-q", LolData.SOLO)
-                        .addChoice("Flex", LolData.FLEX),
+                        .addChoice("Solo-q", Rank.SOLO_QUEUE_TYPE)
+                        .addChoice("Flex", Rank.FLEX_QUEUE_TYPE),
                 new OptionData(OptionType.USER, "user", "Get rank's data from a user.")
         );
     }
@@ -32,73 +34,61 @@ public class RankCommand extends BaseCommand {
         User user = event.getOption("user") == null ? event.getUser() : event.getOption("user").getAsUser();
 
         try {
-            JSONArray data =  LolData.getLeagueData(user);
-
-            if(data == null) {
-                event.reply("❌ The request as failed.")
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
-
-            if(event.getOption("type") == null) {
-                //TODO
-                return;
-            }
-
-            String rankType = event.getOption("type").getAsString();
-            JSONObject rankData = null;
-
-            for(int i = 0; i < data.length(); i++) {
-                 if(data.getJSONObject(i).getString("queueType").equals(rankType)) {
-                     rankData = data.getJSONObject(i);
-                     break;
-                 }
-            }
-
-            if(rankData == null) {
-                event.reply("No data found for this entry.")
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
-
-            System.out.println("ranked-icons/Rank=" +
-                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
-                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
+            Rank[] ranks = LolData.getLeagueData(user);
 
             EmbedBuilder embed = new EmbedBuilder();
+
+            if(ranks == null) {
+                embed.setDescription("No data found.");
+                embed.setColor(Color.RED);
+                event.replyEmbeds(embed.build()).queue();
+
+                return;
+            }
+
+            OptionMapping queueType = event.getOption("type");
+            Rank rank = queueType != null ? this.getSpecificsRank(queueType.getAsString(), ranks) : ranks[0];
+
             embed.setTitle("Ranked Information");
-            embed.setDescription(user.getName() + " | " + (rankType.equals(LolData.SOLO) ? "Solo-Q" : "Flex"));
-            embed.addField("LP", String.valueOf(rankData.getInt(LolData.LEAGUE_POINTS)), true);
-            embed.addField("Rank", rankData.getString(LolData.TIER) + " " + rankData.getString(LolData.RANK), true);
-            embed.addBlankField(true);
-            embed.addField("Wins", String.valueOf(rankData.getInt(LolData.WINS)), true);
-            embed.addField("Losses", String.valueOf(rankData.getInt(LolData.LOSSES)), true);
+            embed.setDescription(user.getName() + " - " + Rank.getQueueName(rank.getQueueType()));
+            Random random = new Random();
+            embed.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+            embed.addField("🛡️ | Rank", rank.getTier() + " " + rank.getRank(), true);
+            embed.addField("🗡️ | LP", String.valueOf(rank.getLeaguePoints()), false);
+            embed.addField("🏆 | Wins", String.valueOf(rank.getWins()), false);
+            embed.addField("😢 | Losses", String.valueOf(rank.getLosses()), false);
 
             MyImage image = new MyImage("ranked-icons/Rank=" +
-                    rankData.getString(LolData.TIER).substring(0, 1).toUpperCase() +
-                    rankData.getString(LolData.TIER).substring(1).toLowerCase() + ".png");
+                    rank.getTier().substring(0, 1).toUpperCase() +
+                    rank.getTier().substring(1).toLowerCase() + ".png");
             InputStream is = image.getImageAsInputStream();
 
-            if (is != null) {
+            if(is != null) {
                 embed.setThumbnail("attachment://rank.png");
 
                 event.replyEmbeds(embed.build())
                         .addFiles(FileUpload.fromData(is, "rank.png"))
                         .queue();
             } else {
-                event.replyEmbeds(embed.build()).queue();
+                event.replyEmbeds(embed.build())
+                        .queue();
             }
-
-        } catch (AccountNotFoundException e) {
+        } catch(RequestFailedException exception) {
+            event.reply("Error " + exception.getErrorCode())
+                    .setEphemeral(true)
+                    .queue();
+        } catch(AccountNotFoundException exception) {
             event.reply("❌ No account was found.")
                     .setEphemeral(true)
                     .queue();
-        } catch(RequestFailedException e) {
-            event.reply("❌ The request as failed (error " + e.getErrorCode() + ").")
-                    .setEphemeral(true)
-                    .queue();
         }
+    }
+
+    private Rank getSpecificsRank(String queueType, Rank[] ranks) {
+        for(Rank rank : ranks) {
+            if(rank.getQueueType().equals(queueType)) return rank;
+        }
+
+        return null;
     }
 }
