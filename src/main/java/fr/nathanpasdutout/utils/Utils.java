@@ -8,16 +8,17 @@ public class Utils {
         return content.substring(0, 1).toUpperCase() + content.substring(1).toLowerCase();
     }
 
-    public static String getDateFormat(String date) {
-        OffsetDateTime dateTime = OffsetDateTime.parse(date);
-        return Utils.capitalizeFirstLetter(dateTime.getMonth().name())
+    public static String getDateFormat(OffsetDateTime date) {
+        if(date == null) return "N/A";
+
+        return Utils.capitalizeFirstLetter(date.getMonth().name())
                 + " "
-                + dateTime.getDayOfMonth()
+                + date.getDayOfMonth()
                 + ", at "
-                + dateTime.getHour()
+                + date.getHour()
                 + ":"
-                + dateTime.getMinute()
+                + date.getMinute()
                 + ":"
-                + dateTime.getSecond();
+                + date.getSecond();
     }
 }
